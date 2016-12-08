@@ -70,6 +70,7 @@ class ImgFigure extends React.Component {
 */
 		var imgFigureClassName = "img-figure";
 			imgFigureClassName += this.props.arrange.isInverse ? ' is-inverse': '';
+			imgFigureClassName += this.props.arrange.isCenter ? ' is-center': '';
 		return ( 
 			<figure className = {imgFigureClassName} 
 					style={styleObj} onClick={this.handleClick.bind(this)}>

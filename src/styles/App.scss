@@ -50,6 +50,9 @@ html, body {
       &.is-inverse{
         transform:translate(320px)rotateY(180deg) /* translate 使得翻转时图片不会再左移 */
       }
+      &.is-center{
+        z-index:1;
+      }
     }
     
     figcaption {
