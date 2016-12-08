@@ -35,7 +35,11 @@ function get30DegRandom() {
 class ImgFigure extends React.Component {
 
 	handleClick(e){
-		this.props.inverse();
+		if(this.props.arrange.isCenter){
+			this.props.inverse();
+		}else{
+			this.props.center();
+		}
 		e.stopPropagation();
 		e.preventDefault();
 	}
@@ -48,13 +52,22 @@ class ImgFigure extends React.Component {
 		}
 		//如果图片的旋转角度不为0，添加旋转的角度
 		if(this.props.arrange.rotate){
-
+			
 			(['MozTransform', 'msTransform', 'WebkitTransform', 'transform']).forEach(function(value){
 				styleObj[value] = 'rotate(' + this.props.arrange.rotate + 'deg)';
 			}.bind(this));
 			
 		}
 
+		//这种写法在firefox 15 会无法使用
+/*		if(this.props.arrange.rotate){
+
+			(['-moz-', '-ms-', '-webkit-', '']).forEach(function(value){
+				styleObj[value + 'transform'] = 'rotate(' + this.props.arrange.rotate + 'deg)';
+			}.bind(this));
+			
+		}
+*/
 		var imgFigureClassName = "img-figure";
 			imgFigureClassName += this.props.arrange.isInverse ? ' is-inverse': '';
 		return ( 
@@ -74,6 +87,34 @@ class ImgFigure extends React.Component {
 				</figcaption> 
 			</figure> 
 		);
+	}
+}
+
+
+class ControllerUnit extends React.Component{
+	handleClick(e){
+		if(this.props.arrange.isCenter){
+			this.props.inverse();
+		}else{
+			this.props.center();
+		}
+		e.preventDefault();
+		e.stopPropagation();
+	}
+
+	render(){
+
+		var controllerUnitClassName = "controller-unit";
+		if(this.props.arrange.isCenter){
+			controllerUnitClassName += " is-center";
+
+			if(this.props.arrange.isInverse){
+				controllerUnitClassName += " is-inverse";
+			}
+		}
+		return (
+			<span className={controllerUnitClassName} onClick={this.handleClick.bind(this)}></span>
+		)
 	}
 }
 
@@ -126,6 +167,11 @@ class AppComponent extends React.Component {
 				}.bind(this);
 			}
 
+			center(index){
+				return function(){
+					this.rearrange(index);
+				}.bind(this);
+			}
 
 		  /*
 		   * 重新布局所有图片
@@ -144,7 +190,7 @@ class AppComponent extends React.Component {
 		        vPosRangeX = vPosRange.x,
 
 		        imgsArrangeTopArr = [],
-		        topImgNum = Math.floor(Math.random() * 2),    // 取一个或者不取
+		        topImgNum = Math.floor(Math.random() * 2),    // 取一个或者不取,ceil向上取整，floor向下取整
 		        topImgSpliceIndex = 0,
 
 		        imgsArrangeCenterArr = imgsArrangeArr.splice(centerIndex, 1);
@@ -267,11 +313,21 @@ class AppComponent extends React.Component {
 		                isCenter: false
 					}
 				}
-				imgFigures.push( <ImgFigure 
+				imgFigures.push( <ImgFigure  key={index}
 							data = {value} 
 							ref={'imgFigure' + index} 
 							arrange={this.state.imgsArrangeArr[index]}
-							inverse={this.inverse(index)} />);
+							inverse={this.inverse(index)} 
+							center={this.center(index)}
+							/>);
+
+
+				controllerUnits.push(<ControllerUnit  
+										key={index} 
+										arrange={this.state.imgsArrangeArr[index]} 
+										inverse={this.inverse(index)} 
+										center={this.center(index)}
+										/>);
 			}.bind(this));
 				/*  	for(var obj in imageDatas){
 				  		imgFigures.push(<ImgFigure data={obj} />);
